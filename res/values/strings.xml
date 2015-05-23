@@ -241,6 +241,9 @@
 	<string name="filesystem">File System</string>
 	<string name="filesystem_root">File System Root</string>
 	
+	<string name="encrypt">Encrypt</string>
+	<string name="decrypt">Decrypt</string>
+	
 	<string name="system_path">System</string>
 	<string-array name="sort_fields_entries">
         <item>Name</item>

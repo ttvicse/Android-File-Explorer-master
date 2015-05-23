@@ -1760,6 +1760,8 @@ containing a value of this type.
         public static final int list_item_bg_light=0x7f020061;
     }
     public static final class id {
+        public static final int Decrypt=0x7f06004f;
+        public static final int Encrypt=0x7f06004e;
         public static final int action_bar=0x7f060031;
         public static final int action_bar_activity_content=0x7f060018;
         public static final int action_bar_container=0x7f060030;
@@ -1798,19 +1800,19 @@ containing a value of this type.
         public static final int listMode=0x7f060002;
         public static final int list_item=0x7f060025;
         public static final int menu_add_bookmark=0x7f060045;
-        public static final int menu_bookmark_toggle=0x7f060052;
-        public static final int menu_cancel=0x7f060055;
+        public static final int menu_bookmark_toggle=0x7f060054;
+        public static final int menu_cancel=0x7f060057;
         public static final int menu_copy=0x7f060047;
         public static final int menu_cut=0x7f060048;
         public static final int menu_delete=0x7f060049;
-        public static final int menu_goto=0x7f06004e;
-        public static final int menu_media_exclusion=0x7f060053;
-        public static final int menu_newfolder=0x7f060050;
-        public static final int menu_paste=0x7f060051;
+        public static final int menu_goto=0x7f060050;
+        public static final int menu_media_exclusion=0x7f060055;
+        public static final int menu_newfolder=0x7f060052;
+        public static final int menu_paste=0x7f060053;
         public static final int menu_props=0x7f06004d;
-        public static final int menu_refresh=0x7f06004f;
+        public static final int menu_refresh=0x7f060051;
         public static final int menu_rename=0x7f06004a;
-        public static final int menu_settings=0x7f060054;
+        public static final int menu_settings=0x7f060056;
         public static final int menu_share=0x7f060046;
         public static final int menu_unzip=0x7f06004c;
         public static final int menu_zip=0x7f06004b;
@@ -1985,7 +1987,7 @@ containing a value of this type.
         public static final int add_bookmark_prompt_hint=0x7f0b0060;
         public static final int alarms=0x7f0b0024;
         public static final int app_name=0x7f0b0010;
-        public static final int app_version=0x7f0b00c5;
+        public static final int app_version=0x7f0b00c7;
         public static final int bookmarks=0x7f0b0012;
         public static final int bookmarks_count=0x7f0b002c;
         public static final int bookmarks_count_0=0x7f0b002d;
@@ -2004,9 +2006,11 @@ containing a value of this type.
         public static final int copying_path=0x7f0b006e;
         public static final int create_folder=0x7f0b0070;
         public static final int cut_toast=0x7f0b0046;
+        public static final int decrypt=0x7f0b00c3;
         public static final int delete_failed=0x7f0b0068;
         public static final int deleting_path=0x7f0b006d;
         public static final int empty_folder=0x7f0b002a;
+        public static final int encrypt=0x7f0b00c2;
         public static final int enter_folder_name=0x7f0b0071;
         public static final int enter_new_name=0x7f0b006a;
         public static final int enter_zip_file_name=0x7f0b004f;
@@ -2072,8 +2076,8 @@ containing a value of this type.
         public static final int pref_home_folder_desc=0x7f0b0081;
         public static final int pref_media_rescan=0x7f0b00aa;
         public static final int pref_media_rescan_desc=0x7f0b00ab;
-        public static final int pref_media_scan_exclusion=0x7f0b00c3;
-        public static final int pref_media_scan_exclusion_desc=0x7f0b00c4;
+        public static final int pref_media_scan_exclusion=0x7f0b00c5;
+        public static final int pref_media_scan_exclusion_desc=0x7f0b00c6;
         public static final int pref_quickactions=0x7f0b0088;
         public static final int pref_quickactions_off=0x7f0b008a;
         public static final int pref_quickactions_on=0x7f0b0089;
@@ -2129,7 +2133,7 @@ containing a value of this type.
         public static final int share_via=0x7f0b0043;
         public static final int size_is=0x7f0b00bc;
         public static final int success=0x7f0b003c;
-        public static final int system_path=0x7f0b00c2;
+        public static final int system_path=0x7f0b00c4;
         public static final int total_capacity=0x7f0b00bd;
         public static final int unzip_abort_partial=0x7f0b0058;
         public static final int unzip_aborted=0x7f0b0059;

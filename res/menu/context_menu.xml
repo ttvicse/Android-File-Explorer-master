@@ -44,5 +44,11 @@
     <item
         android:id="@+id/menu_props"
         android:title="@string/action_prop"/>
+    <item
+        android:id="@+id/Encrypt"
+        android:title="@string/encrypt"/>
+    <item
+        android:id="@+id/Decrypt"
+        android:title="@string/decrypt"/>
 
 </menu>
