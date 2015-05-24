@@ -14,7 +14,6 @@ import net.appositedesigns.fileexplorer.callbacks.FileActionsCallback;
 import net.appositedesigns.fileexplorer.model.FileListEntry;
 import net.appositedesigns.fileexplorer.model.FileListing;
 import net.appositedesigns.fileexplorer.util.FileActionsHelper;
-import net.appositedesigns.fileexplorer.util.FileStorage;
 import net.appositedesigns.fileexplorer.util.Util;
 import net.appositedesigns.fileexplorer.workers.FileMover;
 import net.appositedesigns.fileexplorer.workers.Finder;
@@ -69,7 +68,6 @@ public class FileListActivity extends BaseFileListActivity {
 	private boolean excludeFromMedia = false;
 
 	private File mCascadeFile;
-	private FileStorage fs;
 	
 	private BaseLoaderCallback mLoaderCallback = new BaseLoaderCallback(this) {
 		
@@ -78,7 +76,7 @@ public class FileListActivity extends BaseFileListActivity {
 			switch (status) {
 			case LoaderCallbackInterface.SUCCESS: {
 				Log.i(TAG, "OpenCV loaded successfully");
-				System.loadLibrary("filestorage");
+				System.loadLibrary("samples");
 				try {
 					InputStream is = getResources().openRawResource(
 							R.raw.lbpcascade_frontalface);
