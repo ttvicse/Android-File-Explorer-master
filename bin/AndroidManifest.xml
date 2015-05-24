@@ -1,11 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="net.appositedesigns.fileexplorer"
+    android:installLocation="auto"
     android:versionCode="21"
-    android:versionName="@string/app_version" 
-    android:installLocation="auto">
+    android:versionName="@string/app_version" >
 
-    <uses-sdk android:minSdkVersion="11" android:maxSdkVersion="21"/>
+    <uses-sdk
+        android:maxSdkVersion="21"
+        android:minSdkVersion="11" />
 
     <permission-group android:name="android.permission-group.STORAGE" >
     </permission-group>
@@ -27,25 +29,27 @@
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
-            
             <intent-filter>
                 <action android:name="net.appositedesigns.fileexplorer.action.OPEN_FOLDER" />
+
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
-            
-            <intent-filter android:label="@string/pick_file">
+            <intent-filter android:label="@string/pick_file" >
                 <action android:name="android.intent.action.GET_CONTENT" />
-                <data android:mimeType="*/*"/>
+
+                <data android:mimeType="*/*" />
+
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.OPENABLE" />
             </intent-filter>
         </activity>
         <activity
-            android:icon="@drawable/bookmark_icon"
             android:name=".activity.BookmarkListActivity"
+            android:icon="@drawable/bookmark_icon"
             android:label="@string/bookmarks" >
-             <intent-filter>
+            <intent-filter>
                 <action android:name="net.appositedesigns.fileexplorer.action.OPEN_BOOKMARKS" />
+
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity>
@@ -53,6 +57,25 @@
             android:name=".activity.SettingsActivity"
             android:label="@string/settings" >
         </activity>
+        <activity
+            android:name=".activity.Tutorial1Activity"
+            android:label="@string/camera" >
+        </activity>
     </application>
+
+    <uses-permission android:name="android.permission.CAMERA" />
+
+    <uses-feature
+        android:name="android.hardware.camera"
+        android:required="false" />
+    <uses-feature
+        android:name="android.hardware.camera.autofocus"
+        android:required="false" />
+    <uses-feature
+        android:name="android.hardware.camera.front"
+        android:required="false" />
+    <uses-feature
+        android:name="android.hardware.camera.front.autofocus"
+        android:required="false" />
 
 </manifest>

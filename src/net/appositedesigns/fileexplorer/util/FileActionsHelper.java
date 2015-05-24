@@ -19,6 +19,7 @@ import android.widget.Toast;
 
 import net.appositedesigns.fileexplorer.R;
 import net.appositedesigns.fileexplorer.activity.FileListActivity;
+import net.appositedesigns.fileexplorer.activity.Tutorial1Activity;
 import net.appositedesigns.fileexplorer.callbacks.CancellationCallback;
 import net.appositedesigns.fileexplorer.callbacks.OperationCallback;
 import net.appositedesigns.fileexplorer.model.FileListEntry;
@@ -83,13 +84,15 @@ public class FileActionsHelper {
 		// AES class
 		// PCA class
 		// camera class
-		AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(
-				mContext);
-		alertDialogBuilder.setMessage("TODO: Encrypt").setCancelable(true);
+		//AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(
+		//		mContext);
+		//alertDialogBuilder.setMessage("TODO: Encrypt").setCancelable(true);
 		// create alert dialog
-		AlertDialog alertDialog = alertDialogBuilder.create();
+		//AlertDialog alertDialog = alertDialogBuilder.create();
 		// show it
-		alertDialog.show();
+		//alertDialog.show();
+		Intent i = new Intent(mContext,Tutorial1Activity.class);
+		mContext.startActivity(i);
 	}
 
 	public static void Decrypt(final FileListEntry file,

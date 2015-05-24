@@ -3,6 +3,7 @@
     
 	<string name="app_name">File Explorer</string>
 	<string name="settings">Preferences</string>
+	<string name="camera">Camera Preview</string>
 		<string name="bookmarks">Bookmarks</string>
 	
 	<string name="eula_popup_title">Welcome to File Explorer</string>
