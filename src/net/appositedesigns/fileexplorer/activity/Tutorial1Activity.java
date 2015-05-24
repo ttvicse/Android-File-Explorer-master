@@ -34,12 +34,12 @@ public class Tutorial1Activity extends Activity implements
 
 	private Mat mRgba;
 	private Mat mGray;
+	// private Mat mean;
+	// private Mat eigenvectors;
 
 	private File mCascadeFile;
-	
-	private BaseLoaderCallback mLoaderCallback = new BaseLoaderCallback(this) {
-		
 
+	private BaseLoaderCallback mLoaderCallback = new BaseLoaderCallback(this) {
 		@Override
 		public void onManagerConnected(int status) {
 			switch (status) {
@@ -67,7 +67,7 @@ public class Tutorial1Activity extends Activity implements
 					e.printStackTrace();
 					Log.e(TAG, "Failed to load file. Exception thrown: " + e);
 				}
-				nativeCalcFeatures(mCascadeFile.getAbsolutePath());
+				// nativeCalcFeatures(mCascadeFile.getAbsolutePath());
 				Log.i(TAG, "call nativeCalcFeatures successfully");
 			}
 				break;
@@ -98,7 +98,10 @@ public class Tutorial1Activity extends Activity implements
 			mOpenCvCameraView = (CameraBridgeViewBase) findViewById(R.id.tutorial1_activity_native_surface_view);
 
 		mOpenCvCameraView.setVisibility(SurfaceView.VISIBLE);
-
+		/**
+		 * 3. How to change resolution of camera ?
+		 */
+		//mOpenCvCameraView.setMaxFrameSize(180, 200);
 		mOpenCvCameraView.setCvCameraViewListener(this);
 	}
 
@@ -165,11 +168,16 @@ public class Tutorial1Activity extends Activity implements
 	public Mat onCameraFrame(CvCameraViewFrame inputFrame) {
 		mRgba = inputFrame.rgba();
 		mGray = inputFrame.gray();
-		FindFeatures(mGray.getNativeObjAddr(), mRgba.getNativeObjAddr());
-
+		//FindFeatures(mGray.getNativeObjAddr(), mRgba.getNativeObjAddr());
+		/**
+		 * debug only.
+		 */
+		DrawRectangle(mGray.getNativeObjAddr(), mRgba.getNativeObjAddr());
+		//nativeCalcFeatures(mCascadeFile.getAbsolutePath(),mGray.getNativeObjAddr());
 		return mRgba;
 	}
 
 	public native void FindFeatures(long matAddrGr, long matAddrRgba);
-	private static native void nativeCalcFeatures(String location);
+	public native void DrawRectangle(long matAddrGr, long matAddrRgba);
+	private static native void nativeCalcFeatures(String location, long matAddrGr);
 }
