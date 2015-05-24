@@ -1,10 +1,35 @@
 package net.appositedesigns.fileexplorer.activity;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.List;
+
+import net.appositedesigns.fileexplorer.FileExplorerApp;
+import net.appositedesigns.fileexplorer.R;
+import net.appositedesigns.fileexplorer.adapters.FileListAdapter;
+import net.appositedesigns.fileexplorer.callbacks.CancellationCallback;
+import net.appositedesigns.fileexplorer.callbacks.FileActionsCallback;
+import net.appositedesigns.fileexplorer.model.FileListEntry;
+import net.appositedesigns.fileexplorer.model.FileListing;
+import net.appositedesigns.fileexplorer.util.FileActionsHelper;
+import net.appositedesigns.fileexplorer.util.FileStorage;
+import net.appositedesigns.fileexplorer.util.Util;
+import net.appositedesigns.fileexplorer.workers.FileMover;
+import net.appositedesigns.fileexplorer.workers.Finder;
+
+import org.apache.commons.io.FileUtils;
+import org.opencv.android.BaseLoaderCallback;
+import org.opencv.android.LoaderCallbackInterface;
+import org.opencv.android.OpenCVLoader;
+
 import android.app.ActionBar;
 import android.app.ActionBar.OnNavigationListener;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.AlertDialog.Builder;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
@@ -24,30 +49,12 @@ import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
 
-import net.appositedesigns.fileexplorer.FileExplorerApp;
-import net.appositedesigns.fileexplorer.R;
-import net.appositedesigns.fileexplorer.adapters.FileListAdapter;
-import net.appositedesigns.fileexplorer.callbacks.CancellationCallback;
-import net.appositedesigns.fileexplorer.callbacks.FileActionsCallback;
-import net.appositedesigns.fileexplorer.model.FileListEntry;
-import net.appositedesigns.fileexplorer.model.FileListing;
-import net.appositedesigns.fileexplorer.util.FileActionsHelper;
-import net.appositedesigns.fileexplorer.util.Util;
-import net.appositedesigns.fileexplorer.workers.FileMover;
-import net.appositedesigns.fileexplorer.workers.Finder;
-
-import org.apache.commons.io.FileUtils;
-
-import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
-
 public class FileListActivity extends BaseFileListActivity {
 
 	private static final String TAG = FileListActivity.class.getName();
-	
+
 	private static final String CURRENT_DIR_DIR = "current-dir";
-	
+
 	private ListView explorerListView;
 	private File currentDir;
 	private List<FileListEntry> files;
@@ -59,20 +66,66 @@ public class FileListActivity extends BaseFileListActivity {
 	private FileExplorerApp app;
 	private File previousOpenDirChild;
 	private boolean focusOnParent;
-	private boolean excludeFromMedia  = false;
+	private boolean excludeFromMedia = false;
+
+	private File mCascadeFile;
+	private FileStorage fs;
+	
+	private BaseLoaderCallback mLoaderCallback = new BaseLoaderCallback(this) {
+		
+
+		public void onManagerConnected(int status) {
+			switch (status) {
+			case LoaderCallbackInterface.SUCCESS: {
+				Log.i(TAG, "OpenCV loaded successfully");
+				System.loadLibrary("filestorage");
+				try {
+					InputStream is = getResources().openRawResource(
+							R.raw.lbpcascade_frontalface);
+					File cascadeDir = getDir("cascade", Context.MODE_PRIVATE);
+					mCascadeFile = new File(cascadeDir,
+							"lbpcascade_frontalface.xml");
+
+					FileOutputStream os = new FileOutputStream(mCascadeFile);
+
+					byte[] buffer = new byte[4096];
+					int bytesRead;
+					while ((bytesRead = is.read(buffer)) != -1) {
+						os.write(buffer, 0, bytesRead);
+					}
+					is.close();
+					os.close();
+
+				} catch (Exception e) {
+					e.printStackTrace();
+					Log.e(TAG, "Failed to load file. Exception thrown: " + e);
+				}
+
+				//fs = new FileStorage();
+				//fs.CalcFeatures(mCascadeFile.getAbsolutePath());
+				// fs.SayHello();
+			}
+				break;
+			default: {
+				super.onManagerConnected(status);
+			}
+				break;
+			}
+		};
+	};
 
 	/** Called when the activity is first created. */
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 
-		app = (FileExplorerApp)getApplication();
-		isPicker = getIntent().getBooleanExtra(FileExplorerApp.EXTRA_IS_PICKER, false);
-		if(Intent.ACTION_GET_CONTENT.equals(getIntent().getAction()))
-		{
-			isPicker  = true;
+		app = (FileExplorerApp) getApplication();
+		isPicker = getIntent().getBooleanExtra(FileExplorerApp.EXTRA_IS_PICKER,
+				false);
+		if (Intent.ACTION_GET_CONTENT.equals(getIntent().getAction())) {
+			isPicker = true;
 			app.setFileAttachIntent(getIntent());
 		}
-		
+
 		initUi();
 		initGotoLocations();
 		super.onCreate(savedInstanceState);
@@ -93,15 +146,14 @@ public class FileListActivity extends BaseFileListActivity {
 	}
 
 	private void initUi() {
-		if(isPicker)
-		{
+		if (isPicker) {
 			getWindow().setUiOptions(0);
 		}
-		
+
 	}
 
 	private void initGotoLocations() {
-		
+
 		gotoLocations = getResources().getStringArray(R.array.goto_locations);
 	}
 
@@ -124,8 +176,9 @@ public class FileListActivity extends BaseFileListActivity {
 		});
 
 		explorerListView.setOnItemLongClickListener(getLongPressListener());
-		registerForContextMenu(explorerListView);		
+		registerForContextMenu(explorerListView);
 	}
+
 	// Code Long press_sub menu
 	private OnItemLongClickListener getLongPressListener() {
 		return new OnItemLongClickListener() {
@@ -133,23 +186,20 @@ public class FileListActivity extends BaseFileListActivity {
 			public boolean onItemLongClick(AdapterView<?> arg0,
 					final View view, int arg2, long arg3) {
 
-				if(!explorerListView.isLongClickable())
+				if (!explorerListView.isLongClickable())
 					return true;
-				if(isPicker)
-				{
+				if (isPicker) {
 					return false;
 				}
-				 view.setSelected(true);
+				view.setSelected(true);
 
 				final FileListEntry fileListEntry = (FileListEntry) adapter
 						.getItem(arg2);
-				
-				
+
 				if (mCurrentActionMode != null) {
 					return false;
 				}
-				if (Util.isProtected(fileListEntry
-						.getPath())) {
+				if (Util.isProtected(fileListEntry.getPath())) {
 					return false;
 				}
 				explorerListView.setEnabled(false);
@@ -159,8 +209,7 @@ public class FileListActivity extends BaseFileListActivity {
 								FileListActivity.this, fileListEntry) {
 
 							@Override
-							public void onDestroyActionMode(
-									ActionMode mode) {
+							public void onDestroyActionMode(ActionMode mode) {
 								view.setSelected(false);
 								mCurrentActionMode = null;
 								explorerListView.setEnabled(true);
@@ -177,25 +226,23 @@ public class FileListActivity extends BaseFileListActivity {
 	private void initRootDir(Bundle savedInstanceState) {
 		// If app was restarted programmatically, find where the user last left
 		// it
-		String restartDirPath = getIntent().getStringExtra(FileExplorerApp.EXTRA_FOLDER);
-		
-		if (restartDirPath != null) 
-		{
+		String restartDirPath = getIntent().getStringExtra(
+				FileExplorerApp.EXTRA_FOLDER);
+
+		if (restartDirPath != null) {
 			File restartDir = new File(restartDirPath);
 			if (restartDir.exists() && restartDir.isDirectory()) {
 				currentDir = restartDir;
 				getIntent().removeExtra(FileExplorerApp.EXTRA_FOLDER);
 			}
-		}
-		else if (savedInstanceState!=null && savedInstanceState.getSerializable(CURRENT_DIR_DIR) != null) {
-			
-			currentDir = new File(savedInstanceState
-					.getSerializable(CURRENT_DIR_DIR).toString());
-		} 
-		else 
-		{
+		} else if (savedInstanceState != null
+				&& savedInstanceState.getSerializable(CURRENT_DIR_DIR) != null) {
+
+			currentDir = new File(savedInstanceState.getSerializable(
+					CURRENT_DIR_DIR).toString());
+		} else {
 			currentDir = getPreferenceHelper().getStartDir();
-		}		
+		}
 	}
 
 	protected void onSaveInstanceState(Bundle outState) {
@@ -210,67 +257,69 @@ public class FileListActivity extends BaseFileListActivity {
 		actionBar.setDisplayHomeAsUpEnabled(true);
 		actionBar.setDisplayShowTitleEnabled(false);
 		actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_LIST);
-		
-		mSpinnerAdapter = new ArrayAdapter<CharSequence>(this, android.R.layout.simple_spinner_dropdown_item, gotoLocations);
-		actionBar.setListNavigationCallbacks(mSpinnerAdapter, getActionbarListener(actionBar));
-		
+
+		mSpinnerAdapter = new ArrayAdapter<CharSequence>(this,
+				android.R.layout.simple_spinner_dropdown_item, gotoLocations);
+		actionBar.setListNavigationCallbacks(mSpinnerAdapter,
+				getActionbarListener(actionBar));
+
 	}
 
 	private OnNavigationListener getActionbarListener(final ActionBar actionBar) {
 		return new OnNavigationListener() {
-			
+
 			@Override
-			public boolean onNavigationItemSelected(int itemPosition, long itemId) {
-				
+			public boolean onNavigationItemSelected(int itemPosition,
+					long itemId) {
+
 				int selectedIndex = actionBar.getSelectedNavigationIndex();
-				
-				if(selectedIndex == 0)
-				{
+
+				if (selectedIndex == 0) {
 					return false;
 				}
 				switch (selectedIndex) {
-					
+
 				case 1:
 					listContents(getPreferenceHelper().getStartDir());
 					break;
-					
-					
+
 				case 2:
 					listContents(new File("/sdcard"));
 					break;
-					
+
 				case 3:
 					listContents(Util.getDownloadsFolder());
 					break;
-					
+
 				case 4:
 					listContents(Util.getDcimFolder());
 					break;
-					
+
 				case 5:
 					openBookmarks(actionBar);
 					break;
 				case 6:
-					Util.gotoPath(currentDir.getAbsolutePath(), FileListActivity.this, new CancellationCallback() {
-						
-						@Override
-						public void onCancel() {
-							 actionBar.setSelectedNavigationItem(0);
-							
-						}
-					});
+					Util.gotoPath(currentDir.getAbsolutePath(),
+							FileListActivity.this, new CancellationCallback() {
+
+								@Override
+								public void onCancel() {
+									actionBar.setSelectedNavigationItem(0);
+
+								}
+							});
 					break;
 
 				default:
 					break;
 				}
-				
-				
+
 				return true;
 			}
 
 		};
 	}
+
 	private void openBookmarks(final ActionBar actionBar) {
 		Intent intent = new Intent();
 		intent.setAction(FileExplorerApp.ACTION_OPEN_BOOKMARK);
@@ -282,12 +331,12 @@ public class FileListActivity extends BaseFileListActivity {
 
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-		
+
 		switch (requestCode) {
 		case FileExplorerApp.REQ_PICK_BOOKMARK:
-			if(resultCode == RESULT_OK)
-			{
-				String selectedBookmark = data.getStringExtra(FileExplorerApp.EXTRA_SELECTED_BOOKMARK);
+			if (resultCode == RESULT_OK) {
+				String selectedBookmark = data
+						.getStringExtra(FileExplorerApp.EXTRA_SELECTED_BOOKMARK);
 				listContents(new File(selectedBookmark));
 			}
 			break;
@@ -296,9 +345,12 @@ public class FileListActivity extends BaseFileListActivity {
 			break;
 		}
 	}
+
 	@Override
 	protected void onResume() {
 		super.onResume();
+		OpenCVLoader.initAsync(OpenCVLoader.OPENCV_VERSION_2_4_3, this,
+				mLoaderCallback);
 		if (shouldRestartApp) {
 			shouldRestartApp = false;
 			restartApp();
@@ -308,8 +360,7 @@ public class FileListActivity extends BaseFileListActivity {
 	@Override
 	public void onBackPressed() {
 
-		if(isPicker)
-		{
+		if (isPicker) {
 			super.onBackPressed();
 			return;
 		}
@@ -326,16 +377,16 @@ public class FileListActivity extends BaseFileListActivity {
 	}
 
 	void select(File file) {
-		if (Util.isProtected(file)){
+		if (Util.isProtected(file)) {
 			new Builder(this)
 					.setTitle(getString(R.string.access_denied))
 					.setMessage(
 							getString(R.string.cant_open_dir, file.getName()))
 					.show();
 		} else if (file.isDirectory()) {
-			
+
 			listContents(file);
-			
+
 		} else {
 			doFileAction(file);
 		}
@@ -345,14 +396,11 @@ public class FileListActivity extends BaseFileListActivity {
 		if (Util.isProtected(file) || file.isDirectory()) {
 			return;
 		}
-		
-		if(isPicker)
-		{
+
+		if (isPicker) {
 			pickFile(file);
 			return;
-		}
-		else
-		{
+		} else {
 			openFile(file);
 			return;
 		}
@@ -377,20 +425,18 @@ public class FileListActivity extends BaseFileListActivity {
 		return;
 	}
 
-	public void listContents(File dir)
-	{
+	public void listContents(File dir) {
 		listContents(dir, null);
 	}
+
 	public void listContents(File dir, File previousOpenDirChild) {
 		if (!dir.isDirectory() || Util.isProtected(dir)) {
 			return;
 		}
-		if(previousOpenDirChild!=null)
-		{
-			this.previousOpenDirChild = new File(previousOpenDirChild.getAbsolutePath());
-		}
-		else
-		{
+		if (previousOpenDirChild != null) {
+			this.previousOpenDirChild = new File(
+					previousOpenDirChild.getAbsolutePath());
+		} else {
 			this.previousOpenDirChild = null;
 		}
 		new Finder(this).execute(dir);
@@ -408,39 +454,34 @@ public class FileListActivity extends BaseFileListActivity {
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		MenuInflater inflater = getMenuInflater();
-		
-		if(isPicker)
-		{
+
+		if (isPicker) {
 			inflater.inflate(R.menu.picker_options_menu, menu);
-		}
-		else 
-		{
+		} else {
 			inflater.inflate(R.menu.options_menu, menu);
 		}
 		return true;
-		
+
 	}
 
 	@Override
 	public boolean onPrepareOptionsMenu(Menu menu) {
 
-		if(!isPicker)
-		{
-			if(getPreferenceHelper().isMediaExclusionEnabled())
-			{
+		if (!isPicker) {
+			if (getPreferenceHelper().isMediaExclusionEnabled()) {
 				menu.findItem(R.id.menu_media_exclusion).setVisible(true);
-				menu.findItem(R.id.menu_media_exclusion).setChecked(excludeFromMedia);
-			}
-			else
-			{
+				menu.findItem(R.id.menu_media_exclusion).setChecked(
+						excludeFromMedia);
+			} else {
 				menu.findItem(R.id.menu_media_exclusion).setVisible(false);
 			}
-			menu.findItem(R.id.menu_bookmark_toggle).setChecked(bookmarker.isBookmarked(currentDir.getAbsolutePath()));
+			menu.findItem(R.id.menu_bookmark_toggle).setChecked(
+					bookmarker.isBookmarked(currentDir.getAbsolutePath()));
 			if (Util.canPaste(currentDir)) {
 				menu.findItem(R.id.menu_paste).setVisible(true);
 			} else {
 				menu.findItem(R.id.menu_paste).setVisible(false);
-			}	
+			}
 		}
 		return super.onPrepareOptionsMenu(menu);
 	}
@@ -459,25 +500,22 @@ public class FileListActivity extends BaseFileListActivity {
 			setResult(RESULT_CANCELED);
 			finish();
 			return true;
-			
+
 		case R.id.menu_bookmark_toggle:
 			boolean setBookmark = item.isChecked();
 			item.setChecked(!setBookmark);
-			if(!setBookmark)
-			{
+			if (!setBookmark) {
 				bookmarker.addBookmark(currentDir.getAbsolutePath());
-			}
-			else
-			{
+			} else {
 				bookmarker.removeBookmark(currentDir.getAbsolutePath());
 			}
 			return true;
-			
+
 		case R.id.menu_media_exclusion:
 			item.setChecked(!excludeFromMedia);
 			setMediaExclusionForFolder();
 			return true;
-			
+
 		case R.id.menu_goto:
 			Util.gotoPath(currentDir.getAbsolutePath(), this);
 			return true;
@@ -489,7 +527,7 @@ public class FileListActivity extends BaseFileListActivity {
 		case R.id.menu_refresh:
 			refresh();
 			return true;
-			
+
 		case R.id.menu_newfolder:
 			confirmCreateFolder();
 			return true;
@@ -509,21 +547,15 @@ public class FileListActivity extends BaseFileListActivity {
 
 	private void setMediaExclusionForFolder() {
 
-		if(excludeFromMedia)
-		{
-			//Now include folder in media
+		if (excludeFromMedia) {
+			// Now include folder in media
 			FileUtils.deleteQuietly(new File(currentDir, ".nomedia"));
 			excludeFromMedia = false;
-		}
-		else
-		{
-			try
-			{
+		} else {
+			try {
 				FileUtils.touch(new File(currentDir, ".nomedia"));
 				excludeFromMedia = true;
-			}
-			catch(Exception e)
-			{
+			} catch (Exception e) {
 				Log.e(TAG, "Error occurred while creating .nomedia file", e);
 			}
 		}
@@ -536,8 +568,8 @@ public class FileListActivity extends BaseFileListActivity {
 		AlertDialog.Builder alert = new AlertDialog.Builder(this);
 
 		alert.setTitle(getString(R.string.confirm));
-		alert.setMessage(getString(R.string.confirm_paste_text,
-				Util.getFileToPaste().getName()));
+		alert.setMessage(getString(R.string.confirm_paste_text, Util
+				.getFileToPaste().getName()));
 
 		alert.setPositiveButton(android.R.string.ok,
 				new DialogInterface.OnClickListener() {
@@ -576,8 +608,7 @@ public class FileListActivity extends BaseFileListActivity {
 				new DialogInterface.OnClickListener() {
 					public void onClick(DialogInterface dialog, int whichButton) {
 						CharSequence newDir = input.getText();
-						if (Util.mkDir(
-								currentDir.getAbsolutePath(), newDir)) {
+						if (Util.mkDir(currentDir.getAbsolutePath(), newDir)) {
 							listContents(currentDir);
 						}
 					}
@@ -595,11 +626,12 @@ public class FileListActivity extends BaseFileListActivity {
 
 	}
 
-	public synchronized void setCurrentDirAndChilren(File dir, FileListing folderListing) {
+	public synchronized void setCurrentDirAndChilren(File dir,
+			FileListing folderListing) {
 		currentDir = dir;
 
 		List<FileListEntry> children = folderListing.getChildren();
-		excludeFromMedia   = folderListing.isExcludeFromMedia();
+		excludeFromMedia = folderListing.isExcludeFromMedia();
 		TextView emptyText = (TextView) findViewById(android.R.id.empty);
 		if (emptyText != null) {
 			emptyText.setText(R.string.empty_folder);
@@ -608,42 +640,34 @@ public class FileListActivity extends BaseFileListActivity {
 		files.addAll(children);
 		adapter.notifyDataSetChanged();
 		getActionBar().setSelectedNavigationItem(0);
-		
-		if(Util.isRoot(currentDir))
-		{
-			gotoLocations[0] = getString(R.string.filesystem);	
-		}
-		else
-		{
+
+		if (Util.isRoot(currentDir)) {
+			gotoLocations[0] = getString(R.string.filesystem);
+		} else {
 			gotoLocations[0] = currentDir.getName();
 		}
-		
-		if(previousOpenDirChild!=null && focusOnParent)
-		{
-			int position = files.indexOf(new FileListEntry(previousOpenDirChild.getAbsolutePath()));
-			if(position>=0)
-			explorerListView.setSelection(position);
-		}
-		else
-		{
+
+		if (previousOpenDirChild != null && focusOnParent) {
+			int position = files.indexOf(new FileListEntry(previousOpenDirChild
+					.getAbsolutePath()));
+			if (position >= 0)
+				explorerListView.setSelection(position);
+		} else {
 			explorerListView.setSelection(0);
 		}
 		mSpinnerAdapter.notifyDataSetChanged();
-		
+
 		ActionBar ab = getActionBar();
 		ab.setSelectedNavigationItem(0);
-		
-		ab.setSubtitle(getString(R.string.item_count_subtitle, children.size()));				
-		if(Util.isRoot(currentDir) || currentDir.getParentFile()==null)
-    	{
+
+		ab.setSubtitle(getString(R.string.item_count_subtitle, children.size()));
+		if (Util.isRoot(currentDir) || currentDir.getParentFile() == null) {
 			ab.setDisplayHomeAsUpEnabled(false);
 			ab.setTitle(getString(R.string.filesystem));
-    	}
-    	else
-    	{
-    		ab.setTitle(currentDir.getName());
-    		ab.setDisplayHomeAsUpEnabled(true);
-    	}
+		} else {
+			ab.setTitle(currentDir.getName());
+			ab.setDisplayHomeAsUpEnabled(true);
+		}
 	}
 
 	public void refresh() {
@@ -657,9 +681,8 @@ public class FileListActivity extends BaseFileListActivity {
 		i.putExtra(FileExplorerApp.EXTRA_FOLDER, currentDir.getAbsolutePath());
 		startActivity(i);
 	}
-	
-	public boolean isInPickMode()
-	{
+
+	public boolean isInPickMode() {
 		return isPicker;
 	}
 
