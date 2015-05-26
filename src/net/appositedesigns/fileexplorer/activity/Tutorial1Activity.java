@@ -1,21 +1,13 @@
 package net.appositedesigns.fileexplorer.activity;
 
 import java.io.File;
-import java.io.FileOutputStream;
-import java.io.InputStream;
-import java.util.List;
 
 import net.appositedesigns.fileexplorer.R;
 
-import org.opencv.android.BaseLoaderCallback;
 import org.opencv.android.CameraBridgeViewBase;
 import org.opencv.android.CameraBridgeViewBase.CvCameraViewFrame;
 import org.opencv.android.CameraBridgeViewBase.CvCameraViewListener2;
-import org.opencv.android.LoaderCallbackInterface;
-import org.opencv.android.OpenCVLoader;
 import org.opencv.core.Mat;
-import org.opencv.core.Size;
-import org.opencv.highgui.Highgui;
 
 import android.app.Activity;
 import android.content.Context;
@@ -43,48 +35,6 @@ public class Tutorial1Activity extends Activity implements
 	private File mCascadeFile;
 	private File mFeatureFile;
 
-	private BaseLoaderCallback mLoaderCallback = new BaseLoaderCallback(this) {
-		@Override
-		public void onManagerConnected(int status) {
-			switch (status) {
-			case LoaderCallbackInterface.SUCCESS: {
-				Log.i(TAG, "OpenCV loaded successfully");
-				mOpenCvCameraView.enableView();
-				try {
-					InputStream is = getResources().openRawResource(
-							R.raw.lbpcascade_frontalface);
-					File cascadeDir = getDir("cascade", Context.MODE_PRIVATE);
-					mCascadeFile = new File(cascadeDir,
-							"lbpcascade_frontalface.xml");
-
-					mFeatureFile = new File(cascadeDir, "feature_vector.xml");
-
-					FileOutputStream os = new FileOutputStream(mCascadeFile);
-
-					byte[] buffer = new byte[4096];
-					int bytesRead;
-					while ((bytesRead = is.read(buffer)) != -1) {
-						os.write(buffer, 0, bytesRead);
-					}
-					is.close();
-					os.close();
-
-				} catch (Exception e) {
-					e.printStackTrace();
-					Log.e(TAG, "Failed to load file. Exception thrown: " + e);
-				}
-				// nativeCalcFeatures(mCascadeFile.getAbsolutePath());
-				Log.i(TAG, "call nativeCalcFeatures successfully");
-			}
-				break;
-			default: {
-				super.onManagerConnected(status);
-			}
-				break;
-			}
-		}
-	};
-
 	public Tutorial1Activity() {
 		Log.i(TAG, "Instantiated new " + this.getClass());
 	}
@@ -95,22 +45,19 @@ public class Tutorial1Activity extends Activity implements
 		Log.i(TAG, "called onCreate");
 		super.onCreate(savedInstanceState);
 		getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
-		/*
-		 * getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
-		 * WindowManager.LayoutParams.FLAG_FULLSCREEN);
-		 */
 		setContentView(R.layout.tutorial1_surface_view);
+
+		File cascadeDir = getDir("cascade", Context.MODE_PRIVATE);
+		mCascadeFile = new File(cascadeDir, "lbpcascade_frontalface.xml");
+		mFeatureFile = new File(cascadeDir, "feature_vector.xml");
 
 		if (mIsJavaCamera)
 			mOpenCvCameraView = (CameraBridgeViewBase) findViewById(R.id.tutorial1_activity_java_surface_view);
 		else
 			mOpenCvCameraView = (CameraBridgeViewBase) findViewById(R.id.tutorial1_activity_native_surface_view);
 
+		mOpenCvCameraView.enableView();
 		mOpenCvCameraView.setVisibility(SurfaceView.VISIBLE);
-		/**
-		 * 3. How to change resolution of camera ?
-		 */
-		// mOpenCvCameraView.setMaxFrameSize(180, 200);
 		mOpenCvCameraView.setCvCameraViewListener(this);
 	}
 
@@ -124,8 +71,6 @@ public class Tutorial1Activity extends Activity implements
 	@Override
 	public void onResume() {
 		super.onResume();
-		OpenCVLoader.initAsync(OpenCVLoader.OPENCV_VERSION_2_4_3, this,
-				mLoaderCallback);
 	}
 
 	public void onDestroy() {
@@ -177,6 +122,7 @@ public class Tutorial1Activity extends Activity implements
 	public Mat onCameraFrame(CvCameraViewFrame inputFrame) {
 		mRgba = inputFrame.rgba();
 		mGray = inputFrame.gray();
+
 		// Log.i(TAG,mRgba.height()+"x"+mRgba.width());
 		/**
 		 * debug only.
@@ -186,6 +132,8 @@ public class Tutorial1Activity extends Activity implements
 		return mRgba;
 	}
 
-	private static native void nativeCalcFeatures(String traindatabase_location,
-			String feature_vector_location, long matAddrGr);
+	private static native void nativeCalcFeatures(
+			String traindatabase_location, String feature_vector_location,
+			long matAddrGr);
+
 }

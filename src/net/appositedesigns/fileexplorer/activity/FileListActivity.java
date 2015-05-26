@@ -70,8 +70,6 @@ public class FileListActivity extends BaseFileListActivity {
 	private File mCascadeFile;
 	
 	private BaseLoaderCallback mLoaderCallback = new BaseLoaderCallback(this) {
-		
-
 		public void onManagerConnected(int status) {
 			switch (status) {
 			case LoaderCallbackInterface.SUCCESS: {
@@ -83,7 +81,7 @@ public class FileListActivity extends BaseFileListActivity {
 					File cascadeDir = getDir("cascade", Context.MODE_PRIVATE);
 					mCascadeFile = new File(cascadeDir,
 							"lbpcascade_frontalface.xml");
-
+					
 					FileOutputStream os = new FileOutputStream(mCascadeFile);
 
 					byte[] buffer = new byte[4096];
@@ -98,10 +96,6 @@ public class FileListActivity extends BaseFileListActivity {
 					e.printStackTrace();
 					Log.e(TAG, "Failed to load file. Exception thrown: " + e);
 				}
-
-				//fs = new FileStorage();
-				//fs.CalcFeatures(mCascadeFile.getAbsolutePath());
-				// fs.SayHello();
 			}
 				break;
 			default: {
