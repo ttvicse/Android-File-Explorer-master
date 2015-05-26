@@ -51,6 +51,14 @@ obj/local/x86/objs/samples/jni_part.o: jni/jni_part.cpp \
  ../../sdk/native/jni/include/opencv2/flann/miniflann.hpp \
  ../../sdk/native/jni/include/opencv2/flann/defines.h \
  ../../sdk/native/jni/include/opencv2/flann/config.h \
+ ../../sdk/native/jni/include/opencv2/contrib/contrib.hpp \
+ ../../sdk/native/jni/include/opencv2/objdetect/objdetect.hpp \
+ E:/android-ndk-r8e/sources/cxx-stl/gnu-libstdc++/4.6/include/deque \
+ ../../sdk/native/jni/include/opencv2/contrib/retina.hpp \
+ E:/android-ndk-r8e/sources/cxx-stl/gnu-libstdc++/4.6/include/valarray \
+ ../../sdk/native/jni/include/opencv2/contrib/openfabmap.hpp \
+ E:/android-ndk-r8e/sources/cxx-stl/gnu-libstdc++/4.6/include/list \
+ E:/android-ndk-r8e/sources/cxx-stl/gnu-libstdc++/4.6/include/set \
  E:/android-ndk-r8e/platforms/android-9/arch-x86/usr/include/android/log.h
 
 E:/android-ndk-r8e/platforms/android-9/arch-x86/usr/include/jni.h:
@@ -156,5 +164,21 @@ E:/android-ndk-r8e/sources/cxx-stl/gnu-libstdc++/4.6/include/limits:
 ../../sdk/native/jni/include/opencv2/flann/defines.h:
 
 ../../sdk/native/jni/include/opencv2/flann/config.h:
+
+../../sdk/native/jni/include/opencv2/contrib/contrib.hpp:
+
+../../sdk/native/jni/include/opencv2/objdetect/objdetect.hpp:
+
+E:/android-ndk-r8e/sources/cxx-stl/gnu-libstdc++/4.6/include/deque:
+
+../../sdk/native/jni/include/opencv2/contrib/retina.hpp:
+
+E:/android-ndk-r8e/sources/cxx-stl/gnu-libstdc++/4.6/include/valarray:
+
+../../sdk/native/jni/include/opencv2/contrib/openfabmap.hpp:
+
+E:/android-ndk-r8e/sources/cxx-stl/gnu-libstdc++/4.6/include/list:
+
+E:/android-ndk-r8e/sources/cxx-stl/gnu-libstdc++/4.6/include/set:
 
 E:/android-ndk-r8e/platforms/android-9/arch-x86/usr/include/android/log.h:

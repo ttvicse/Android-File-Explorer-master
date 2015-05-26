@@ -3,16 +3,19 @@ package net.appositedesigns.fileexplorer.activity;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.InputStream;
+import java.util.List;
 
 import net.appositedesigns.fileexplorer.R;
 
 import org.opencv.android.BaseLoaderCallback;
+import org.opencv.android.CameraBridgeViewBase;
 import org.opencv.android.CameraBridgeViewBase.CvCameraViewFrame;
+import org.opencv.android.CameraBridgeViewBase.CvCameraViewListener2;
 import org.opencv.android.LoaderCallbackInterface;
 import org.opencv.android.OpenCVLoader;
 import org.opencv.core.Mat;
-import org.opencv.android.CameraBridgeViewBase;
-import org.opencv.android.CameraBridgeViewBase.CvCameraViewListener2;
+import org.opencv.core.Size;
+import org.opencv.highgui.Highgui;
 
 import android.app.Activity;
 import android.content.Context;
@@ -38,6 +41,7 @@ public class Tutorial1Activity extends Activity implements
 	// private Mat eigenvectors;
 
 	private File mCascadeFile;
+	private File mFeatureFile;
 
 	private BaseLoaderCallback mLoaderCallback = new BaseLoaderCallback(this) {
 		@Override
@@ -52,6 +56,8 @@ public class Tutorial1Activity extends Activity implements
 					File cascadeDir = getDir("cascade", Context.MODE_PRIVATE);
 					mCascadeFile = new File(cascadeDir,
 							"lbpcascade_frontalface.xml");
+
+					mFeatureFile = new File(cascadeDir, "feature_vector.xml");
 
 					FileOutputStream os = new FileOutputStream(mCascadeFile);
 
@@ -89,7 +95,10 @@ public class Tutorial1Activity extends Activity implements
 		Log.i(TAG, "called onCreate");
 		super.onCreate(savedInstanceState);
 		getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
-
+		/*
+		 * getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
+		 * WindowManager.LayoutParams.FLAG_FULLSCREEN);
+		 */
 		setContentView(R.layout.tutorial1_surface_view);
 
 		if (mIsJavaCamera)
@@ -101,7 +110,7 @@ public class Tutorial1Activity extends Activity implements
 		/**
 		 * 3. How to change resolution of camera ?
 		 */
-		//mOpenCvCameraView.setMaxFrameSize(180, 200);
+		// mOpenCvCameraView.setMaxFrameSize(180, 200);
 		mOpenCvCameraView.setCvCameraViewListener(this);
 	}
 
@@ -168,16 +177,15 @@ public class Tutorial1Activity extends Activity implements
 	public Mat onCameraFrame(CvCameraViewFrame inputFrame) {
 		mRgba = inputFrame.rgba();
 		mGray = inputFrame.gray();
-		//FindFeatures(mGray.getNativeObjAddr(), mRgba.getNativeObjAddr());
+		// Log.i(TAG,mRgba.height()+"x"+mRgba.width());
 		/**
 		 * debug only.
 		 */
-		DrawRectangle(mGray.getNativeObjAddr(), mRgba.getNativeObjAddr());
-		//nativeCalcFeatures(mCascadeFile.getAbsolutePath(),mGray.getNativeObjAddr());
+		nativeCalcFeatures(mCascadeFile.getAbsolutePath(),
+				mFeatureFile.getAbsolutePath(), mGray.getNativeObjAddr());
 		return mRgba;
 	}
 
-	public native void FindFeatures(long matAddrGr, long matAddrRgba);
-	public native void DrawRectangle(long matAddrGr, long matAddrRgba);
-	private static native void nativeCalcFeatures(String location, long matAddrGr);
+	private static native void nativeCalcFeatures(String traindatabase_location,
+			String feature_vector_location, long matAddrGr);
 }

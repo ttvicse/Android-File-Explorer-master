@@ -1945,7 +1945,8 @@ containing a value of this type.
         public static final int picker_options_menu=0x7f0f0003;
     }
     public static final class raw {
-        public static final int lbpcascade_frontalface=0x7f060000;
+        public static final int feature_vector=0x7f060000;
+        public static final int lbpcascade_frontalface=0x7f060001;
     }
     public static final class string {
         /**  Content description for the action bar "home" affordance. [CHAR LIMIT=NONE] 

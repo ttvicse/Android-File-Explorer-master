@@ -2,6 +2,7 @@
 #include <opencv2/core/core.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
 #include <opencv2/features2d/features2d.hpp>
+#include <opencv2/contrib/contrib.hpp>
 #include <vector>
 #include <android/log.h>
 
@@ -14,69 +15,50 @@ using namespace cv;
 
 extern "C" {
 
-JNIEXPORT void JNICALL Java_net_appositedesigns_fileexplorer_activity_Tutorial1Activity_DrawRectangle(
-		JNIEnv*, jobject, jlong addrGray, jlong addrRgba);
-JNIEXPORT void JNICALL Java_net_appositedesigns_fileexplorer_activity_Tutorial1Activity_DrawRectangle(
-		JNIEnv*, jobject, jlong addrGray, jlong addrRgba) {
-	Mat& mGr = *(Mat*) addrGray;
-	Mat& mRgb = *(Mat*) addrRgba;
-	int w = mRgb.rows;
-	int h = mRgb.cols;
-	rectangle(mRgb, Point(w / 4, h / 4), Point(3 * w / 4, 3 * w / 4),
-			Scalar(0, 255, 255), -1, 8);
-}
-
-JNIEXPORT void JNICALL Java_net_appositedesigns_fileexplorer_activity_Tutorial1Activity_FindFeatures(
-		JNIEnv*, jobject, jlong addrGray, jlong addrRgba);
-JNIEXPORT void JNICALL Java_net_appositedesigns_fileexplorer_activity_Tutorial1Activity_FindFeatures(
-		JNIEnv*, jobject, jlong addrGray, jlong addrRgba) {
-	LOGD("Entering FindFeatures !!!");
-
-	Mat& mGr = *(Mat*) addrGray;
-	Mat& mRgb = *(Mat*) addrRgba;
-	vector<KeyPoint> v;
-
-	FastFeatureDetector detector(50);
-	detector.detect(mGr, v);
-	for (unsigned int i = 0; i < v.size(); i++) {
-		const KeyPoint& kp = v[i];
-		circle(mRgb, Point(kp.pt.x, kp.pt.y), 10, Scalar(255, 0, 0, 255));
-	}
-}
-
 JNIEXPORT void JNICALL Java_net_appositedesigns_fileexplorer_activity_Tutorial1Activity_nativeCalcFeatures(
-		JNIEnv *, jclass, jstring, jlong);
+		JNIEnv *, jclass, jstring, jstring, jlong);
 JNIEXPORT void JNICALL Java_net_appositedesigns_fileexplorer_activity_Tutorial1Activity_nativeCalcFeatures(
-		JNIEnv *env, jclass, jstring location, jlong addrGray) {
+		JNIEnv *env, jclass, jstring train_file, jstring feature_file,
+		jlong addrGray) {
 	LOGD("Entering nativeCalcFeatures !!!");
-	const char *nativeString = env->GetStringUTFChars(location, NULL);
+	const char *nativeStringTrain = env->GetStringUTFChars(train_file, NULL);
+	const char *nativeStringFeature = env->GetStringUTFChars(feature_file,
+			NULL);
+
 	Mat mean, eigenvalues, eigenvectors;
 
-	string filepath = string(nativeString);
+	string filepathtrain = string(nativeStringTrain);
+	string filepathfeature = string(nativeStringFeature);
+
 	{
 		FileStorage fs;
-		fs.open(filepath, FileStorage::READ);
+		fs.open(filepathtrain, FileStorage::READ);
 
 		if (!fs.isOpened()) {
-			LOGI("Can't open file: %s ", filepath.c_str());
+			LOGI("Can't open file: %s ", filepathtrain.c_str());
 		}
-
-		LOGD("READ BEGING !!!");
-
-
 		fs["mean"] >> mean;
-		LOGI("%d , %d\n", mean.rows, mean.cols);
-
 		fs["eigenvectors"] >> eigenvectors;
-		LOGI("%d , %d\n", eigenvectors.rows, eigenvectors.cols);
 
-		LOGD("READ ENDED !!!");
+		LOGD("READ TRAINDATABASE SUCCESSFUL !");
 	}
 
 	Mat& mGr = *(Mat*) addrGray;
-	LOGI("%d , %d\n", mGr.rows, mGr.cols);
 
-	Mat face = mGr(cv::Rect(mGr.cols / 2, mGr.rows / 2, 200, 180));
-	LOGI("%d , %d\n", face.rows, face.cols);
+	cv::resize(mGr, mGr, Size(200, 180), 0, 0, INTER_NEAREST);
+
+	/**
+	 * 1. project test image to facespaces here.
+	 */
+	Mat project = subspaceProject(eigenvectors, mean, mGr.reshape(1, 1));
+
+	LOGI("%d , %d\n", mGr.rows, mGr.cols);
+	{
+		FileStorage fs;
+		fs.open(filepathfeature, FileStorage::WRITE);
+		fs << "project" << project;
+	}
+	LOGD("SAVE FEATURE VECTOR SUCCESSFUL !");
+
 }
 }
