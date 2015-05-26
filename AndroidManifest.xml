@@ -59,9 +59,18 @@
         </activity>
         <activity
             android:name=".activity.Tutorial1Activity"
-            android:label="@string/camera" >
+            android:configChanges="keyboardHidden|orientation"
+            android:label="@string/camera"
+            android:screenOrientation="landscape" >
         </activity>
     </application>
+
+    <supports-screens
+        android:anyDensity="true"
+        android:largeScreens="true"
+        android:normalScreens="true"
+        android:resizeable="true"
+        android:smallScreens="true" />
 
     <uses-permission android:name="android.permission.CAMERA" />
 

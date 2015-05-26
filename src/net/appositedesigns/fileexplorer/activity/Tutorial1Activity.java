@@ -4,9 +4,12 @@ import java.io.File;
 
 import net.appositedesigns.fileexplorer.R;
 
+import org.opencv.android.BaseLoaderCallback;
 import org.opencv.android.CameraBridgeViewBase;
 import org.opencv.android.CameraBridgeViewBase.CvCameraViewFrame;
 import org.opencv.android.CameraBridgeViewBase.CvCameraViewListener2;
+import org.opencv.android.LoaderCallbackInterface;
+import org.opencv.android.OpenCVLoader;
 import org.opencv.core.Mat;
 
 import android.app.Activity;
@@ -35,6 +38,28 @@ public class Tutorial1Activity extends Activity implements
 	private File mCascadeFile;
 	private File mFeatureFile;
 
+	private BaseLoaderCallback mLoaderCallback = new BaseLoaderCallback(this) {
+		@Override
+		public void onManagerConnected(int status) {
+			switch (status) {
+			case LoaderCallbackInterface.SUCCESS: {
+				Log.i(TAG, "OpenCV loaded successfully");
+				File cascadeDir = getDir("cascade", Context.MODE_PRIVATE);
+				mCascadeFile = new File(cascadeDir,
+						"lbpcascade_frontalface.xml");
+				mFeatureFile = new File(cascadeDir, "feature_vector.xml");
+
+				mOpenCvCameraView.enableView();
+			}
+				break;
+			default: {
+				super.onManagerConnected(status);
+			}
+				break;
+			}
+		}
+	};
+
 	public Tutorial1Activity() {
 		Log.i(TAG, "Instantiated new " + this.getClass());
 	}
@@ -47,16 +72,11 @@ public class Tutorial1Activity extends Activity implements
 		getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 		setContentView(R.layout.tutorial1_surface_view);
 
-		File cascadeDir = getDir("cascade", Context.MODE_PRIVATE);
-		mCascadeFile = new File(cascadeDir, "lbpcascade_frontalface.xml");
-		mFeatureFile = new File(cascadeDir, "feature_vector.xml");
-
 		if (mIsJavaCamera)
 			mOpenCvCameraView = (CameraBridgeViewBase) findViewById(R.id.tutorial1_activity_java_surface_view);
 		else
 			mOpenCvCameraView = (CameraBridgeViewBase) findViewById(R.id.tutorial1_activity_native_surface_view);
 
-		mOpenCvCameraView.enableView();
 		mOpenCvCameraView.setVisibility(SurfaceView.VISIBLE);
 		mOpenCvCameraView.setCvCameraViewListener(this);
 	}
@@ -71,6 +91,8 @@ public class Tutorial1Activity extends Activity implements
 	@Override
 	public void onResume() {
 		super.onResume();
+		OpenCVLoader.initAsync(OpenCVLoader.OPENCV_VERSION_2_4_3, this,
+				mLoaderCallback);
 	}
 
 	public void onDestroy() {
@@ -122,13 +144,12 @@ public class Tutorial1Activity extends Activity implements
 	public Mat onCameraFrame(CvCameraViewFrame inputFrame) {
 		mRgba = inputFrame.rgba();
 		mGray = inputFrame.gray();
-
-		// Log.i(TAG,mRgba.height()+"x"+mRgba.width());
 		/**
 		 * debug only.
 		 */
-		nativeCalcFeatures(mCascadeFile.getAbsolutePath(),
-				mFeatureFile.getAbsolutePath(), mGray.getNativeObjAddr());
+		//nativeCalcFeatures(mCascadeFile.getAbsolutePath(),
+		//		mFeatureFile.getAbsolutePath(), mGray.getNativeObjAddr());
+		// mOpenCvCameraView.disableView();
 		return mRgba;
 	}
 
