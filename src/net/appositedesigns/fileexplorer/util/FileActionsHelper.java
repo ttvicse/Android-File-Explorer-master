@@ -92,6 +92,7 @@ public class FileActionsHelper {
 		// show it
 		//alertDialog.show();
 		Intent i = new Intent(mContext,Tutorial1Activity.class);
+		i.putExtra("path", file.getPath());
 		mContext.startActivity(i);
 	}
 

@@ -14,16 +14,20 @@ import org.opencv.core.Mat;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.SurfaceView;
+import android.view.View;
+import android.view.View.OnTouchListener;
 import android.view.WindowManager;
 import android.widget.Toast;
 
 public class Tutorial1Activity extends Activity implements
-		CvCameraViewListener2 {
+		CvCameraViewListener2, OnTouchListener {
 	private static final String TAG = "OCVSample::Activity";
 
 	private CameraBridgeViewBase mOpenCvCameraView;
@@ -32,11 +36,10 @@ public class Tutorial1Activity extends Activity implements
 
 	private Mat mRgba;
 	private Mat mGray;
-	// private Mat mean;
-	// private Mat eigenvectors;
 
 	private File mCascadeFile;
 	private File mFeatureFile;
+	private String path;
 
 	private BaseLoaderCallback mLoaderCallback = new BaseLoaderCallback(this) {
 		@Override
@@ -50,6 +53,7 @@ public class Tutorial1Activity extends Activity implements
 				mFeatureFile = new File(cascadeDir, "feature_vector.xml");
 
 				mOpenCvCameraView.enableView();
+				mOpenCvCameraView.setOnTouchListener(Tutorial1Activity.this);
 			}
 				break;
 			default: {
@@ -71,6 +75,9 @@ public class Tutorial1Activity extends Activity implements
 		super.onCreate(savedInstanceState);
 		getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 		setContentView(R.layout.tutorial1_surface_view);
+
+		Intent i = getIntent();
+		path = i.getStringExtra("path");
 
 		if (mIsJavaCamera)
 			mOpenCvCameraView = (CameraBridgeViewBase) findViewById(R.id.tutorial1_activity_java_surface_view);
@@ -147,14 +154,25 @@ public class Tutorial1Activity extends Activity implements
 		/**
 		 * debug only.
 		 */
-		//nativeCalcFeatures(mCascadeFile.getAbsolutePath(),
-		//		mFeatureFile.getAbsolutePath(), mGray.getNativeObjAddr());
+		// nativeCalcFeatures(mCascadeFile.getAbsolutePath(),
+		// mFeatureFile.getAbsolutePath(), mGray.getNativeObjAddr());
 		// mOpenCvCameraView.disableView();
-		return mRgba;
+		return inputFrame.rgba();
 	}
 
 	private static native void nativeCalcFeatures(
 			String traindatabase_location, String feature_vector_location,
 			long matAddrGr);
+
+	@Override
+	public boolean onTouch(View v, MotionEvent event) {
+		Log.i(TAG, "onTouch event");
+		Toast.makeText(this, path, Toast.LENGTH_SHORT).show();
+		/**
+		 * how to pass argument here ???
+		 */
+		// DES.process(args);
+		return false;
+	}
 
 }

@@ -59,6 +59,7 @@
         </activity>
         <activity
             android:name=".activity.Tutorial1Activity"
+            android:theme="@android:style/Theme.NoTitleBar.Fullscreen"
             android:configChanges="keyboardHidden|orientation"
             android:label="@string/camera"
             android:screenOrientation="landscape" >
