@@ -43,6 +43,7 @@ public class Tutorial1Activity extends Activity implements
 	private File mCascadeFile;
 	private File mFeatureFile;
 	private String path;
+	private String flag;
 
 	private BaseLoaderCallback mLoaderCallback = new BaseLoaderCallback(this) {
 		@Override
@@ -81,7 +82,8 @@ public class Tutorial1Activity extends Activity implements
 
 		Intent i = getIntent();
 		path = i.getStringExtra("path");
-
+		// flag = i.getStringExtra("flag");
+		
 		if (mIsJavaCamera)
 			mOpenCvCameraView = (CameraBridgeViewBase) findViewById(R.id.tutorial1_activity_java_surface_view);
 		else
@@ -154,12 +156,6 @@ public class Tutorial1Activity extends Activity implements
 	public Mat onCameraFrame(CvCameraViewFrame inputFrame) {
 		mRgba = inputFrame.rgba();
 		mGray = inputFrame.gray();
-		/**
-		 * debug only.
-		 */
-		// nativeCalcFeatures(mCascadeFile.getAbsolutePath(),
-		// mFeatureFile.getAbsolutePath(), mGray.getNativeObjAddr());
-		// mOpenCvCameraView.disableView();
 		return inputFrame.rgba();
 	}
 
@@ -170,24 +166,29 @@ public class Tutorial1Activity extends Activity implements
 	@Override
 	public boolean onTouch(View v, MotionEvent event) {
 		Log.i(TAG, "onTouch event");
-		// Toast.makeText(this, path, Toast.LENGTH_SHORT).show();
-		/**
-		 * how to pass argument here ???
-		 */
-		final File file = new File(Environment.getExternalStorageDirectory()
-				.getAbsolutePath(), "input.txt");
-		/*
-		 * if (file.exists()) { Toast.makeText(this, file.getAbsolutePath(),
-		 * Toast.LENGTH_SHORT) .show(); }
-		 */
-		DES des = new DES();
-		try {
-			des.process("1111111111", file.getAbsolutePath());
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+		flag = "decrypt"; // for debug only
+		
+		if(flag.equals("encrypt")) {
+			final File file = new File(Environment.getExternalStorageDirectory()
+					.getAbsolutePath(), "input.txt");
+			try {
+				DES.encrypt("1111111111", file.getAbsolutePath());
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+			Toast.makeText(this, "Encryp success !!!", Toast.LENGTH_SHORT).show();
+			finish();
+		} else {
+			final File file = new File(Environment.getExternalStorageDirectory()
+					.getAbsolutePath(), "input.txt");
+			try {
+				DES.decrypt("1111111111", file.getAbsolutePath());
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+			Toast.makeText(this, "Decrypt success !!!", Toast.LENGTH_SHORT).show();
+			finish();
 		}
-		Toast.makeText(this, "Encryp success !!!", Toast.LENGTH_SHORT).show();
 		return false;
 	}
 

@@ -321,22 +321,13 @@ public class DES {
 	}
 
 	/**
+	 * 
 	 * @param args
+	 * @param url
+	 * @throws IOException
 	 */
-	public static void process(String args, String url) throws IOException {
-		// TODO Auto-generated method stub
-
-		/*
-		 * if(args.length != 1){ System.out.println("Usage: lab1 key(10bits)");
-		 * System.exit(1); }
-		 */
-
+	public static void encrypt(String args, String url) throws IOException {
 		int key10Num = sToint(args);
-		/**
-		 * can't get path frome url here;
-		 */
-		// Path path = Paths.get(url);
-		// byte[] data = Files.readAllBytes(path);
 		File input = new File(url);
 		byte[] data = readBytesFromFile(input);
 
@@ -353,18 +344,30 @@ public class DES {
 		FileOutputStream oFile = new FileOutputStream(url);
 		oFile.write(data1);
 		oFile.close();
-
-		// path = Paths.get(url);
-		// data = Files.readAllBytes(path);
-		/*
-		 * data = readBytesFromFile(input);
-		 * 
-		 * byte[] data2 = new byte[data.length]; for (int i = 0; i <
-		 * data.length; i++) { tmp = decypt(data[i], key); data2[i] = (byte)
-		 * tmp; }
-		 * 
-		 * oFile = new FileOutputStream(url); oFile.write(data2); oFile.close();
-		 */
 	}
 
+	/**
+	 * 
+	 * @param args
+	 * @param url
+	 * @throws IOException
+	 */
+	public static void decrypt(String args, String url) throws IOException {
+		int key10Num = sToint(args);
+		char[][] key = SDESKeySchedule(key10Num);
+
+		File cipher = new File(url);
+		byte[] data = readBytesFromFile(cipher);
+		
+		byte[] data2 = new byte[data.length];
+		int tmp;
+		for (int i = 0; i < data.length; i++) {
+			tmp = decypt(data[i], key);
+			data2[i] = (byte) tmp;
+		}
+
+		FileOutputStream oFile = new FileOutputStream(url);
+		oFile.write(data2);
+		oFile.close();
+	}
 }

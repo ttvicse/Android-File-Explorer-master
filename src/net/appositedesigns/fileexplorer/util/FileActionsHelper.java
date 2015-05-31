@@ -80,56 +80,20 @@ public class FileActionsHelper {
 
 	public static void Encrypt(final FileListEntry file,
 			final FileListActivity mContext) {
-		// TODO: encrypt file
-		// AES class
-		// PCA class
-		// camera class
-		//AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(
-		//		mContext);
-		//alertDialogBuilder.setMessage("TODO: Encrypt").setCancelable(true);
-		// create alert dialog
-		//AlertDialog alertDialog = alertDialogBuilder.create();
-		// show it
-		//alertDialog.show();
-		Intent i = new Intent(mContext,Tutorial1Activity.class);
+		Intent i = new Intent(mContext, Tutorial1Activity.class);
 		i.putExtra("path", file.getPath());
-		//i.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
-		i.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+		i.putExtra("flag", "encrypt");
+		//i.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 		mContext.startActivity(i);
 	}
 
 	public static void Decrypt(final FileListEntry file,
 			final FileListActivity mContext) {
-		// TODO: decrypt
-		// AES class
-		AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(
-				mContext);
-		alertDialogBuilder
-				.setMessage("TODO: Decrypt")
-				.setCancelable(false)
-				.setPositiveButton("Yes",
-						new DialogInterface.OnClickListener() {
-
-							@Override
-							public void onClick(DialogInterface dialog,
-									int which) {
-								// TODO Auto-generated method stub
-								dialog.cancel();
-							}
-						})
-				.setNegativeButton("No", new DialogInterface.OnClickListener() {
-
-					@Override
-					public void onClick(DialogInterface dialog, int which) {
-						// TODO Auto-generated method stub
-						dialog.cancel();
-					}
-				});
-
-		// create alert dialog
-		AlertDialog alertDialog = alertDialogBuilder.create();
-		// show it
-		alertDialog.show();
+		Intent i = new Intent(mContext, Tutorial1Activity.class);
+		i.putExtra("path", file.getPath());
+		i.putExtra("flag", "decrypt");
+		i.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+		mContext.startActivity(i);
 	}
 
 	public static void deleteFile(final File file,
