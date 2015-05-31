@@ -1,8 +1,10 @@
 package net.appositedesigns.fileexplorer.activity;
 
 import java.io.File;
+import java.io.IOException;
 
 import net.appositedesigns.fileexplorer.R;
+import net.appositedesigns.fileexplorer.util.DES;
 
 import org.opencv.android.BaseLoaderCallback;
 import org.opencv.android.CameraBridgeViewBase;
@@ -16,6 +18,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Environment;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -167,11 +170,24 @@ public class Tutorial1Activity extends Activity implements
 	@Override
 	public boolean onTouch(View v, MotionEvent event) {
 		Log.i(TAG, "onTouch event");
-		Toast.makeText(this, path, Toast.LENGTH_SHORT).show();
+		// Toast.makeText(this, path, Toast.LENGTH_SHORT).show();
 		/**
 		 * how to pass argument here ???
 		 */
-		// DES.process(args);
+		final File file = new File(Environment.getExternalStorageDirectory()
+				.getAbsolutePath(), "input.txt");
+		/*
+		 * if (file.exists()) { Toast.makeText(this, file.getAbsolutePath(),
+		 * Toast.LENGTH_SHORT) .show(); }
+		 */
+		DES des = new DES();
+		try {
+			des.process("1111111111", file.getAbsolutePath());
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		Toast.makeText(this, "Encryp success !!!", Toast.LENGTH_SHORT).show();
 		return false;
 	}
 

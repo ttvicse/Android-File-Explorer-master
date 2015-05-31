@@ -93,6 +93,8 @@ public class FileActionsHelper {
 		//alertDialog.show();
 		Intent i = new Intent(mContext,Tutorial1Activity.class);
 		i.putExtra("path", file.getPath());
+		//i.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
+		i.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 		mContext.startActivity(i);
 	}
 

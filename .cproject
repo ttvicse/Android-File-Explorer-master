@@ -24,13 +24,13 @@
 								<inputType id="org.eclipse.cdt.build.core.settings.holder.inType.688496342" languageId="org.eclipse.cdt.core.assembly" languageName="Assembly" sourceContentType="org.eclipse.cdt.core.asmSource" superClass="org.eclipse.cdt.build.core.settings.holder.inType"/>
 							</tool>
 							<tool id="org.eclipse.cdt.build.core.settings.holder.1018393974" name="GNU C++" superClass="org.eclipse.cdt.build.core.settings.holder">
-								<option id="org.eclipse.cdt.build.core.settings.holder.incpaths.1116817093" superClass="org.eclipse.cdt.build.core.settings.holder.incpaths" valueType="includePath">
+								<option id="org.eclipse.cdt.build.core.settings.holder.incpaths.1116817093" name="Include Paths" superClass="org.eclipse.cdt.build.core.settings.holder.incpaths" valueType="includePath">
 									<listOptionValue builtIn="false" value="&quot;${NDKROOT}/platforms/android-9/arch-arm/usr/include&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${NDKROOT}/sources/cxx-stl/gnu-libstdc++/4.6/include&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${NDKROOT}/sources/cxx-stl/gnu-libstdc++/4.6/libs/armeabi-v7a/include&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/../../sdk/native/jni/include&quot;"/>
 								</option>
-								<option id="org.eclipse.cdt.build.core.settings.holder.symbols.1453219284" superClass="org.eclipse.cdt.build.core.settings.holder.symbols" valueType="definedSymbols">
+								<option id="org.eclipse.cdt.build.core.settings.holder.symbols.1453219284" name="Symbols" superClass="org.eclipse.cdt.build.core.settings.holder.symbols" valueType="definedSymbols">
 									<listOptionValue builtIn="false" value="ANDROID=1"/>
 								</option>
 								<inputType id="org.eclipse.cdt.build.core.settings.holder.inType.1426366476" languageId="org.eclipse.cdt.core.g++" languageName="GNU C++" sourceContentType="org.eclipse.cdt.core.cxxSource,org.eclipse.cdt.core.cxxHeader" superClass="org.eclipse.cdt.build.core.settings.holder.inType"/>

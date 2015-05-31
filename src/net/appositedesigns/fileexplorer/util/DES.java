@@ -8,11 +8,11 @@ package net.appositedesigns.fileexplorer.util;
  * Date create: Mar - 06, 2014
  */
 
-import java.util.BitSet;
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.nio.file.*;
-import java.lang.String;
+import java.io.InputStream;
 
 public class DES {
 
@@ -23,6 +23,10 @@ public class DES {
 	 *            a String type with '0' and '1' character
 	 * @return an integer number
 	 */
+	public DES() {
+		// TODO Auto-generated constructor stub
+	}
+
 	static int sToint(String input) {
 		int tmp = input.length();
 		int result = 0;
@@ -287,9 +291,39 @@ public class DES {
 	}
 
 	/**
+	 * 
+	 * @param file
+	 * @return
+	 * @throws IOException
+	 */
+	public static byte[] readBytesFromFile(File file) throws IOException {
+		InputStream is = new FileInputStream(file);
+
+		long length = file.length();
+		if (length > Integer.MAX_VALUE) {
+			throw new IOException("Could not completely read file "
+					+ file.getName() + "as is too long (" + length
+					+ " bytes, max supported " + Integer.MAX_VALUE + ")");
+		}
+		byte[] bytes = new byte[(int) length];
+		int offset = 0;
+		int numRead = 0;
+		while (offset < bytes.length
+				&& (numRead = is.read(bytes, offset, bytes.length - offset)) > 0) {
+			offset += numRead;
+		}
+		if (offset < bytes.length) {
+			throw new IOException("Could not completely read file "
+					+ file.getName());
+		}
+		is.close();
+		return bytes;
+	}
+
+	/**
 	 * @param args
 	 */
-	public static void process(String args) throws IOException {
+	public static void process(String args, String url) throws IOException {
 		// TODO Auto-generated method stub
 
 		/*
@@ -298,9 +332,14 @@ public class DES {
 		 */
 
 		int key10Num = sToint(args);
+		/**
+		 * can't get path frome url here;
+		 */
+		// Path path = Paths.get(url);
+		// byte[] data = Files.readAllBytes(path);
+		File input = new File(url);
+		byte[] data = readBytesFromFile(input);
 
-		Path path = Paths.get("input.txt");
-		byte[] data = Files.readAllBytes(path);
 		byte[] data1 = new byte[data.length];
 		char[] key10 = { '1', '0', '1', '0', '0', '0', '0', '0', '1', '0' };
 		char[][] key = SDESKeySchedule(key10Num);
@@ -311,22 +350,21 @@ public class DES {
 			data1[i] = (byte) tmp;
 		}
 
-		FileOutputStream oFile = new FileOutputStream("input.txt");
+		FileOutputStream oFile = new FileOutputStream(url);
 		oFile.write(data1);
 		oFile.close();
 
-		path = Paths.get("input.txt");
-		data = Files.readAllBytes(path);
-		byte[] data2 = new byte[data.length];
-		for (int i = 0; i < data.length; i++) {
-			tmp = decypt(data[i], key);
-			data2[i] = (byte) tmp;
-		}
-
-		oFile = new FileOutputStream("input.txt");
-		oFile.write(data2);
-		oFile.close();
-
+		// path = Paths.get(url);
+		// data = Files.readAllBytes(path);
+		/*
+		 * data = readBytesFromFile(input);
+		 * 
+		 * byte[] data2 = new byte[data.length]; for (int i = 0; i <
+		 * data.length; i++) { tmp = decypt(data[i], key); data2[i] = (byte)
+		 * tmp; }
+		 * 
+		 * oFile = new FileOutputStream(url); oFile.write(data2); oFile.close();
+		 */
 	}
 
 }
