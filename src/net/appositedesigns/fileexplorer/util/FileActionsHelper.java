@@ -81,18 +81,18 @@ public class FileActionsHelper {
 	public static void Encrypt(final FileListEntry file,
 			final FileListActivity mContext) {
 		Intent i = new Intent(mContext, Tutorial1Activity.class);
-		i.putExtra("path", file.getPath());
+		i.putExtra("path", file.getPath().getAbsolutePath());
 		i.putExtra("flag", "encrypt");
-		//i.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+		i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 		mContext.startActivity(i);
 	}
 
 	public static void Decrypt(final FileListEntry file,
 			final FileListActivity mContext) {
 		Intent i = new Intent(mContext, Tutorial1Activity.class);
-		i.putExtra("path", file.getPath());
+		i.putExtra("path", file.getPath().getAbsolutePath());
 		i.putExtra("flag", "decrypt");
-		i.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+		i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 		mContext.startActivity(i);
 	}
 

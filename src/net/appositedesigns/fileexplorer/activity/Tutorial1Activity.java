@@ -80,10 +80,10 @@ public class Tutorial1Activity extends Activity implements
 		getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 		setContentView(R.layout.tutorial1_surface_view);
 
-		Intent i = getIntent();
-		path = i.getStringExtra("path");
-		// flag = i.getStringExtra("flag");
-		
+		Intent intent = getIntent();
+		path = intent.getStringExtra("path");
+		flag = intent.getStringExtra("flag");
+
 		if (mIsJavaCamera)
 			mOpenCvCameraView = (CameraBridgeViewBase) findViewById(R.id.tutorial1_activity_java_surface_view);
 		else
@@ -166,27 +166,24 @@ public class Tutorial1Activity extends Activity implements
 	@Override
 	public boolean onTouch(View v, MotionEvent event) {
 		Log.i(TAG, "onTouch event");
-		flag = "decrypt"; // for debug only
 		
-		if(flag.equals("encrypt")) {
-			final File file = new File(Environment.getExternalStorageDirectory()
-					.getAbsolutePath(), "input.txt");
+		if (flag.equals("encrypt")) {
 			try {
-				DES.encrypt("1111111111", file.getAbsolutePath());
+				DES.encrypt("1111111111", path);
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
-			Toast.makeText(this, "Encryp success !!!", Toast.LENGTH_SHORT).show();
+			Toast.makeText(this, "Encryp success !!!", Toast.LENGTH_SHORT)
+					.show();
 			finish();
 		} else {
-			final File file = new File(Environment.getExternalStorageDirectory()
-					.getAbsolutePath(), "input.txt");
 			try {
-				DES.decrypt("1111111111", file.getAbsolutePath());
+				DES.decrypt("1111111111", path);
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
-			Toast.makeText(this, "Decrypt success !!!", Toast.LENGTH_SHORT).show();
+			Toast.makeText(this, "Decrypt success !!!", Toast.LENGTH_SHORT)
+					.show();
 			finish();
 		}
 		return false;
