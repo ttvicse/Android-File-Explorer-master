@@ -77,10 +77,10 @@ public class FileListActivity extends BaseFileListActivity {
 				System.loadLibrary("samples");
 				try {
 					InputStream is = getResources().openRawResource(
-							R.raw.lbpcascade_frontalface);
+							R.raw.traindatabase);
 					File cascadeDir = getDir("cascade", Context.MODE_PRIVATE);
 					mCascadeFile = new File(cascadeDir,
-							"lbpcascade_frontalface.xml");
+							"traindatabase.xml");
 					
 					FileOutputStream os = new FileOutputStream(mCascadeFile);
 

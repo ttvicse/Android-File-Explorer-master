@@ -1,5 +1,23 @@
 package net.appositedesigns.fileexplorer.util;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+
+import net.appositedesigns.fileexplorer.R;
+import net.appositedesigns.fileexplorer.activity.FileListActivity;
+import net.appositedesigns.fileexplorer.activity.Tutorial1Activity;
+import net.appositedesigns.fileexplorer.callbacks.CancellationCallback;
+import net.appositedesigns.fileexplorer.callbacks.OperationCallback;
+import net.appositedesigns.fileexplorer.model.FileListEntry;
+import net.appositedesigns.fileexplorer.workers.Trasher;
+import net.appositedesigns.fileexplorer.workers.Unzipper;
+import net.appositedesigns.fileexplorer.workers.Zipper;
+
+import org.opencv.core.Mat;
+
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.AlertDialog.Builder;
@@ -17,24 +35,10 @@ import android.webkit.MimeTypeMap;
 import android.widget.EditText;
 import android.widget.Toast;
 
-import net.appositedesigns.fileexplorer.R;
-import net.appositedesigns.fileexplorer.activity.FileListActivity;
-import net.appositedesigns.fileexplorer.activity.Tutorial1Activity;
-import net.appositedesigns.fileexplorer.callbacks.CancellationCallback;
-import net.appositedesigns.fileexplorer.callbacks.OperationCallback;
-import net.appositedesigns.fileexplorer.model.FileListEntry;
-import net.appositedesigns.fileexplorer.workers.Trasher;
-import net.appositedesigns.fileexplorer.workers.Unzipper;
-import net.appositedesigns.fileexplorer.workers.Zipper;
-
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.util.ArrayList;
-import java.util.List;
-
 public class FileActionsHelper {
 
 	protected static final String TAG = FileActionsHelper.class.getName();
+	private static File mFeatureFile;
 
 	public static void copyFile(File file, FileListActivity mContext) {
 		Util.setPasteSrcFile(file, Util.PASTE_MODE_COPY);
@@ -80,11 +84,28 @@ public class FileActionsHelper {
 
 	public static void Encrypt(final FileListEntry file,
 			final FileListActivity mContext) {
-		Intent i = new Intent(mContext, Tutorial1Activity.class);
-		i.putExtra("path", file.getPath().getAbsolutePath());
-		i.putExtra("flag", "encrypt");
-		i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-		mContext.startActivity(i);
+		// check if user already registed then do not open camera.
+		mFeatureFile = new File(
+				"/data/data/net.appositedesigns.fileexplorer/app_cascade/feature_vector.xml");
+		if (mFeatureFile.exists()) {
+			Mat feature = new Mat();
+			Tutorial1Activity.getFeatureVector(mFeatureFile.getAbsolutePath(),
+					feature.getNativeObjAddr());
+
+			try {
+				DES.encrypt("1111111111", file.getPath().getAbsolutePath());
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+			Toast.makeText(mContext, "Encryp success !!!", Toast.LENGTH_SHORT)
+					.show();
+		} else {
+			Intent i = new Intent(mContext, Tutorial1Activity.class);
+			i.putExtra("path", file.getPath().getAbsolutePath());
+			i.putExtra("flag", "encrypt");
+			i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+			mContext.startActivity(i);
+		}
 	}
 
 	public static void Decrypt(final FileListEntry file,
@@ -511,5 +532,4 @@ public class FileActionsHelper {
 				mContext.getString(R.string.share_via)));
 
 	}
-
 }

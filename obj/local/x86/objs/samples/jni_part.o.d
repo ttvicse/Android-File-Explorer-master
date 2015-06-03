@@ -44,9 +44,11 @@ obj/local/x86/objs/samples/jni_part.o: jni/jni_part.cpp \
  ../../sdk/native/jni/include/opencv2/core/operations.hpp \
  E:/android-ndk-r8e/sources/cxx-stl/gnu-libstdc++/4.6/include/limits \
  ../../sdk/native/jni/include/opencv2/core/mat.hpp \
+ ../../sdk/native/jni/include/opencv2/highgui/highgui.hpp \
+ ../../sdk/native/jni/include/opencv2/highgui/highgui_c.h \
+ ../../sdk/native/jni/include/opencv2/core/core_c.h \
  ../../sdk/native/jni/include/opencv2/imgproc/imgproc.hpp \
  ../../sdk/native/jni/include/opencv2/imgproc/types_c.h \
- ../../sdk/native/jni/include/opencv2/core/core_c.h \
  ../../sdk/native/jni/include/opencv2/features2d/features2d.hpp \
  ../../sdk/native/jni/include/opencv2/flann/miniflann.hpp \
  ../../sdk/native/jni/include/opencv2/flann/defines.h \
@@ -151,11 +153,15 @@ E:/android-ndk-r8e/sources/cxx-stl/gnu-libstdc++/4.6/include/limits:
 
 ../../sdk/native/jni/include/opencv2/core/mat.hpp:
 
+../../sdk/native/jni/include/opencv2/highgui/highgui.hpp:
+
+../../sdk/native/jni/include/opencv2/highgui/highgui_c.h:
+
+../../sdk/native/jni/include/opencv2/core/core_c.h:
+
 ../../sdk/native/jni/include/opencv2/imgproc/imgproc.hpp:
 
 ../../sdk/native/jni/include/opencv2/imgproc/types_c.h:
-
-../../sdk/native/jni/include/opencv2/core/core_c.h:
 
 ../../sdk/native/jni/include/opencv2/features2d/features2d.hpp:
 

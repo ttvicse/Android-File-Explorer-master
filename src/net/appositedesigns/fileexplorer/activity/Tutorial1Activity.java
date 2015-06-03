@@ -42,6 +42,9 @@ public class Tutorial1Activity extends Activity implements
 
 	private File mCascadeFile;
 	private File mFeatureFile;
+	private File mInputFile;
+	private File cascadeDir;
+
 	private String path;
 	private String flag;
 
@@ -51,9 +54,9 @@ public class Tutorial1Activity extends Activity implements
 			switch (status) {
 			case LoaderCallbackInterface.SUCCESS: {
 				Log.i(TAG, "OpenCV loaded successfully");
-				File cascadeDir = getDir("cascade", Context.MODE_PRIVATE);
+				cascadeDir = getDir("cascade", Context.MODE_PRIVATE);
 				mCascadeFile = new File(cascadeDir,
-						"lbpcascade_frontalface.xml");
+						"traindatabase.xml");
 				mFeatureFile = new File(cascadeDir, "feature_vector.xml");
 
 				mOpenCvCameraView.enableView();
@@ -156,18 +159,31 @@ public class Tutorial1Activity extends Activity implements
 	public Mat onCameraFrame(CvCameraViewFrame inputFrame) {
 		mRgba = inputFrame.rgba();
 		mGray = inputFrame.gray();
-		return inputFrame.rgba();
+		
+		drawLine(mRgba.getNativeObjAddr());
+		return mRgba;
 	}
-
-	private static native void nativeCalcFeatures(
-			String traindatabase_location, String feature_vector_location,
-			long matAddrGr);
 
 	@Override
 	public boolean onTouch(View v, MotionEvent event) {
 		Log.i(TAG, "onTouch event");
-		
 		if (flag.equals("encrypt")) {
+			Mat project = new Mat();
+
+			nativeCalcFeatures(mCascadeFile.getAbsolutePath(),
+					mFeatureFile.getAbsolutePath(), mGray.getNativeObjAddr(),
+					project.getNativeObjAddr());
+
+			saveImage(mGray);
+
+			int rows = project.rows();
+			int cols = project.cols();
+
+			double[] mat = new double[rows * cols];
+			project.get(0, 0, mat);
+
+			// generate key from feature vector here .
+
 			try {
 				DES.encrypt("1111111111", path);
 			} catch (IOException e) {
@@ -176,7 +192,22 @@ public class Tutorial1Activity extends Activity implements
 			Toast.makeText(this, "Encryp success !!!", Toast.LENGTH_SHORT)
 					.show();
 			finish();
-		} else {
+		} else if (flag.equals("decrypt")) {
+			Mat project = new Mat();
+
+			nativeCalcFeatures(mCascadeFile.getAbsolutePath(),
+					mFeatureFile.getAbsolutePath(), mGray.getNativeObjAddr(),
+					project.getNativeObjAddr());
+
+			saveImage(mGray);
+			int rows = project.rows();
+			int cols = project.cols();
+
+			double[] mat = new double[rows * cols];
+			project.get(0, 0, mat);
+
+			// generate key from feature vector here .
+
 			try {
 				DES.decrypt("1111111111", path);
 			} catch (IOException e) {
@@ -189,4 +220,27 @@ public class Tutorial1Activity extends Activity implements
 		return false;
 	}
 
+	private void saveImage(Mat m) {
+		File path = Environment
+				.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES);
+		String filename = "input_image.png";
+		File file = new File(path, filename);
+		saveFileImage(file.getAbsolutePath(),m.getNativeObjAddr());
+		//Highgui.imwrite(file.getAbsolutePath(), m);
+	}
+
+	private String generator(double[] mat) {
+
+		return null;
+	}
+
+	private static native void nativeCalcFeatures(
+			String traindatabase_location, String feature_vector_location,
+			long matAddrGr, long matAddrPr);
+
+	private static native void saveFileImage(String filename, long matAddrGr);
+	private static native void drawLine(long matAddRgb);
+	public static native void getFeatureVector(String feature_location,
+			long matAddrFeature);
+	
 }

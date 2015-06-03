@@ -43,11 +43,9 @@ public final class R {
  <item>Zebra</item> 
  <item>Zebra</item> 
  <item>Zebra</item> 
- <item>Zebra</item> 
          */
         public static final int theme_entries=0x7f0e0006;
         /**  <item>theme_white_black</item> 
- <item>theme_white_black</item> 
  <item>theme_white_black</item> 
  <item>theme_white_black</item> 
  <item>theme_white_black</item> 
@@ -1946,7 +1944,7 @@ containing a value of this type.
     }
     public static final class raw {
         public static final int feature_vector=0x7f060000;
-        public static final int lbpcascade_frontalface=0x7f060001;
+        public static final int traindatabase=0x7f060001;
     }
     public static final class string {
         /**  Content description for the action bar "home" affordance. [CHAR LIMIT=NONE] 
